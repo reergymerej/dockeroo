@@ -1,0 +1,12 @@
+document all functions automatically
+output in json
+
+all functions have
+    * name
+    * source file
+    * source line #
+
+functions may have
+    * privacy (optional)
+    * params (optional)
+    * return (optional)
