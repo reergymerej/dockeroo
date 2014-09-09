@@ -9,7 +9,7 @@ var getFiles = function () {
     return [path.join(process.cwd(), 'dummy/foo.js')];
 };
 
-var files = getFiles();
+
 
 var getLineNumber = function (text, index) {
     var line;
@@ -21,27 +21,50 @@ var getLineNumber = function (text, index) {
     return matches && matches.length + 1;
 };
 
-var getFunctionsData = function (text) {
-    var namedFunctionRegex = /function\s+(.+)(?=\()/g;
-    var functions = {};
+var getFunctionName = function (text) {
+    var name;
+    var match;
 
-    // get fn names
-    var match = namedFunctionRegex.exec(text);
-    var fnName;
+    var assignedFnRegex = /([^\s]+)\s*=\s*function/g;
+    var methodRegex = /([^\s]+)\s*:\s*function/g;
+    var namedFnRegex = /function\s+?([^\s]+)/g;
 
-    while (match !== null) {
-        fnName = match[1];
-        functions[fnName] = {};
+    // Is this function's expression assigned to a value?
+    match = assignedFnRegex.exec(text);
 
-        // get line number
-        functions[fnName].lineNumber = getLineNumber(text, match.index);
-
-
-        match = namedFunctionRegex.exec(text);
+    if (match) {
+        name = match[1];
+    } else {
+        match = methodRegex.exec(text);
+        if (match) {
+            name = match[1];
+        } else {
+            match = namedFnRegex.exec(text);
+            if (match) {
+                name = match[1];
+            }
+        }
     }
 
+    return name;
+};
 
-    return functions;
+var getBlocks = function (text) {
+    var blockRegex = /(\/\*\*(.|\n)+?\*\/)((.|\n)+?function(.|\n)+?)(?=\()/g;
+    var blocks = [];
+    var match = blockRegex.exec(text);
+
+    while (match !== null) {
+        blocks.push({
+            lineNumber: getLineNumber(text, match.index),
+            block: match[1],
+            name: getFunctionName(match[3]),
+            type: 'function'
+        });
+        match = blockRegex.exec(text);
+    }
+
+    return blocks;
 };
 
 var getFileData = function (file) {
@@ -50,15 +73,15 @@ var getFileData = function (file) {
     };
 
     var text = fs.readFileSync(file, {
-            encoding: 'utf8'
+        encoding: 'utf8'
     });
 
-    data.functions = getFunctionsData(text);
-
-    // console.log(text);
+    data.blocks = getBlocks(text);
 
     return data;
 };
+
+var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);

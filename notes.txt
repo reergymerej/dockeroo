@@ -1,12 +1,21 @@
-document all functions automatically
+It's not possible to document all the functions without parsing the JS.
+Instead, make it VERY EASY to write documentation.
+
 output in json
 
-all functions have
-    * name
+blocks look like this
+    /**
+    *
+    */
+
+blocks have
     * source file
     * source line #
 
-functions may have
-    * privacy (optional)
+support documenting functions only (for now)
+
+functions have
+    * name (pick up automatically)
+    * description (optional)
     * params (optional)
     * return (optional)
