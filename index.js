@@ -87,8 +87,42 @@ var getReturn = function (text) {
     return rtn;
 };
 
+var flattenBlock = function (block) {
+    var flattened;
+
+    flattened = block.replace(/(\/\*\*|\*\/)/g, '').
+        replace(/\s*\*/g, '').
+        replace(/\s+/g, ' ').
+        split('@').join('\n@').trim();
+
+
+    console.log('---------');
+    console.log(flattened);
+
+    return flattened;
+};
+
+var getParams = function (block, fnText) {
+    var params = [];
+
+    // flatten block
+    block = flattenBlock(block);
+
+    // console.log(block, fnText);
+
+
+    // console.log(params);
+
+    return params;
+};
+
 var getBlocks = function (text) {
-    var blockRegex = /(\/\*\*(.|\n)+?\*\/)((.|\n)+?function(.|\n)+?)(?=\()/g;
+    // 1 raw block
+    // 2 whitespace
+    // 3 trailing function
+    // 4 whitespace
+    // 5 whitespace
+    var blockRegex = /(\/\*\*(.|\n)+?\*\/)((.|\n)+?function(.|\n)+?)\((\n|.)*?\)/g;
     var blocks = [];
     var match = blockRegex.exec(text);
 
@@ -97,7 +131,8 @@ var getBlocks = function (text) {
             lineNumber: getLineNumber(text, match.index),
             type: 'function',
             raw: match[1],
-            name: getFunctionName(match[3])
+            name: getFunctionName(match[3]),
+            params: getParams(match[1], match[3])
         });
 
         match = blockRegex.exec(text);
@@ -130,7 +165,7 @@ var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);
-    console.log(util.inspect(data, {
-        depth: null
-    }));
+    // console.log(util.inspect(data, {
+    //     depth: null
+    // }));
 });

@@ -5,7 +5,8 @@ var globalFn;
 /**
 * block for foo
 */
-var foo = function () {
+var foo = function (a, b,  c,d,  
+    efg) {
     // foo body
 };
 
