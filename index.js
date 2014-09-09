@@ -99,13 +99,35 @@ var flattenBlock = function (block) {
     return flattened;
 };
 
-var getParams = function (block, fnText) {
+var getParams = function (block, args) {
+
+    console.log('\n-----------\n', block);
+    console.log('args:', args);
+    console.log('^^^^^^^');
+
     var params = [];
+    var paramRegex = /@param.*/gi;
 
-    // flatten block
-    block = flattenBlock(block);
+    args = args.replace(/[\s\(\)]/gi, '').split(',');
+    // If there was nothing there, clear the empty string.
+    if (args.length === 1 && !args[0]) {
+        args = [];
+    }
 
-    // console.log(block, fnText);
+
+    // documented params
+    if (paramRegex.test(block)) {
+        console.log('documented params:', block.match(paramRegex).slice(0));
+        // console.log(block, args);
+    }
+
+    // arguments
+    if (args.length) {
+        console.log('parsed args:', args);
+    }
+
+
+
 
 
     // console.log(params);
@@ -119,11 +141,14 @@ var getBlocks = function (text) {
     // 3 trailing function
     // 4 whitespace
     // 5 whitespace
-    var blockRegex = /(\/\*\*(.|\n)+?\*\/)((.|\n)+?function(.|\n)+?)\((\n|.)*?\)/g;
+    // 6 arguments
+    var blockRegex = /(\/\*\*(.|\n)+?\*\/)((.|\n)+?function(.|\n)+?)(\((\n|.)*?\))/g;
     var blocks = [];
     var match = blockRegex.exec(text);
 
+
     while (match !== null) {
+        // console.log(match.slice(0));
         var flattened = flattenBlock(match[1]);
 
         blocks.push({
@@ -131,7 +156,7 @@ var getBlocks = function (text) {
             type: 'function',
             raw: flattened,
             name: getFunctionName(match[3]),
-            params: getParams(flattened, match[3])
+            params: getParams(flattened, match[6])
         });
 
         match = blockRegex.exec(text);
@@ -164,7 +189,7 @@ var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);
-    console.log(util.inspect(data, {
-        depth: null
-    }));
+    // console.log(util.inspect(data, {
+    //     depth: null
+    // }));
 });

@@ -47,10 +47,11 @@ var obj = {
     },
 
     /**
+    * @param {String} asdf it is the thing
     * @return a desc of return
     * block for obj.fn2
     */
-    fn2 : function () {
+    fn2 : function (asdf) {
 
     }
 };
@@ -59,10 +60,12 @@ var obj = {
 * block for obj.fn3
 * blah
 * more blah
+    * @param {String} arg1 hello
+    * @param {String} dude
 * blah blah
 * @return     {Array}
 */
-obj.fn3 = function () {};
+obj.fn3 = function (arg1, arg2,arg3) {};
 
 /**
 * block for obj.fn4
