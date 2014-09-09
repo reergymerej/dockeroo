@@ -34,7 +34,7 @@ var baz=function bazName() {
 
 var obj = {
     /**
-    * @return
+    * @return {String} a description of the return
     * block for obj.fn
     */
     fn:function doof() {
@@ -42,6 +42,7 @@ var obj = {
     },
 
     /**
+    * @return a desc of return
     * block for obj.fn2
     */
     fn2 : function () {
@@ -54,11 +55,13 @@ var obj = {
 * blah
 * more blah
 * blah blah
-* @return
+* @return     {Array}
 */
 obj.fn3 = function () {};
 
 /**
 * block for obj.fn4
+* @return blah blah
+* @param
 */
 obj['fn4'] = function () {};

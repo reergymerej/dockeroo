@@ -1,5 +1,6 @@
 'use strict';
 
+var util = require('util');
 var path = require('path');
 var fs = require('fs');
 
@@ -47,20 +48,41 @@ var getFunctionName = function (text) {
     return name;
 };
 
+var getTypeFromString = function (str) {
+    var regex = /\{(.+?)\}/g;
+    var match = regex.exec(str);
+    var type = match ? match[1] : undefined;
+    return type;
+};
+
 var getReturn = function (text) {
-    var returnRegex = /@return/g;
-    var match = returnRegex.exec(text);
+    var returnRegex = /(@return)(.|\n)*?(?=(\*\/|@))/g;
+    var typeRegex = /\{(.+?)\}/;
+    var returnSegment = text.match(returnRegex);
+    var type;
+    var description;
     var rtn;
 
-    if (match) {
-        rtn = {
+    // Before we do anything, flatten the text.
+    if (returnSegment !== null) {
+        returnSegment = returnSegment[0];
 
+        // clear out redundant whitespace and *
+        returnSegment = returnSegment.replace(/@return\s+/g, '').
+            replace(/\*/g, '').replace(/\s+/g, ' ');
+
+        rtn = {
+            type: getTypeFromString(returnSegment)
         };
 
-        // TODO: parse the parts of the @return
-    }
+        
+        if (rtn.type) {
+            returnSegment = returnSegment.replace('{' + rtn.type + '}', '');
+        }
 
-    console.log(rtn);
+
+        rtn.description = returnSegment.trim() || undefined;
+    }
 
     return rtn;
 };
@@ -96,6 +118,9 @@ var getFileData = function (file) {
     data.blocks = getBlocks(text);
     data.blocks.forEach(function (block) {
         block.return = getReturn(block.raw);
+
+        // Delete the raw block once we're done.
+        delete block.raw;
     });
 
     return data;
@@ -105,5 +130,7 @@ var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);
-    // console.log(data);
+    console.log(util.inspect(data, {
+        depth: null
+    }));
 });
