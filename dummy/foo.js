@@ -20,6 +20,10 @@ var foo = function (a, b,  c,d,
 
     /**
     * block for bar
+    * @someFakeTag blah blahl
+    * blah blah
+    * blah blah blah
+    * @return {undefined}
     */
     function bar() {
         // bar body

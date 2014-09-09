@@ -56,7 +56,8 @@ var getTypeFromString = function (str) {
 };
 
 var getReturn = function (text) {
-    var returnRegex = /(@return)(.|\n)*?(?=(\*\/|@))/g;
+    // var returnRegex = /(@return)(.|\n)*?(?=(\*\/|@))/g;
+    var returnRegex = /@return.*/g;
     var typeRegex = /\{(.+?)\}/;
     var returnSegment = text.match(returnRegex);
     var type;
@@ -95,10 +96,6 @@ var flattenBlock = function (block) {
         replace(/\s+/g, ' ').
         split('@').join('\n@').trim();
 
-
-    console.log('---------');
-    console.log(flattened);
-
     return flattened;
 };
 
@@ -127,12 +124,14 @@ var getBlocks = function (text) {
     var match = blockRegex.exec(text);
 
     while (match !== null) {
+        var flattened = flattenBlock(match[1]);
+
         blocks.push({
             lineNumber: getLineNumber(text, match.index),
             type: 'function',
-            raw: match[1],
+            raw: flattened,
             name: getFunctionName(match[3]),
-            params: getParams(match[1], match[3])
+            params: getParams(flattened, match[3])
         });
 
         match = blockRegex.exec(text);
@@ -165,7 +164,7 @@ var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);
-    // console.log(util.inspect(data, {
-    //     depth: null
-    // }));
+    console.log(util.inspect(data, {
+        depth: null
+    }));
 });
