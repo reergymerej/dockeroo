@@ -11,6 +11,7 @@ blocks look like this
 blocks have
     * source file
     * source line #
+    * type
 
 support documenting functions only (for now)
 

@@ -9,8 +9,6 @@ var getFiles = function () {
     return [path.join(process.cwd(), 'dummy/foo.js')];
 };
 
-
-
 var getLineNumber = function (text, index) {
     var line;
     var substr = text.substr(0, index);
@@ -49,6 +47,24 @@ var getFunctionName = function (text) {
     return name;
 };
 
+var getReturn = function (text) {
+    var returnRegex = /@return/g;
+    var match = returnRegex.exec(text);
+    var rtn;
+
+    if (match) {
+        rtn = {
+
+        };
+
+        // TODO: parse the parts of the @return
+    }
+
+    console.log(rtn);
+
+    return rtn;
+};
+
 var getBlocks = function (text) {
     var blockRegex = /(\/\*\*(.|\n)+?\*\/)((.|\n)+?function(.|\n)+?)(?=\()/g;
     var blocks = [];
@@ -57,10 +73,11 @@ var getBlocks = function (text) {
     while (match !== null) {
         blocks.push({
             lineNumber: getLineNumber(text, match.index),
-            block: match[1],
-            name: getFunctionName(match[3]),
-            type: 'function'
+            type: 'function',
+            raw: match[1],
+            name: getFunctionName(match[3])
         });
+
         match = blockRegex.exec(text);
     }
 
@@ -77,6 +94,9 @@ var getFileData = function (file) {
     });
 
     data.blocks = getBlocks(text);
+    data.blocks.forEach(function (block) {
+        block.return = getReturn(block.raw);
+    });
 
     return data;
 };
@@ -85,5 +105,5 @@ var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);
-    console.log('data', data);
+    // console.log(data);
 });
