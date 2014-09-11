@@ -4,6 +4,11 @@ var globalFn;
 
 /**
 * block for foo
+* @param {String} a this is the first arg
+* @param This param doesn't have a 
+* type defined, but it
+* has a long description.
+* It's for "b" by the way.
 */
 var foo = function (a, b,  c,d,  
     efg) {
@@ -32,7 +37,7 @@ var foo = function (a, b,  c,d,
 /**
 * block for baz/bazName
 */
-var baz=function bazName() {
+var baz=function bazName(undocumented, args) {
     // bazName body
     console.log('yo');
 };
@@ -61,7 +66,7 @@ var obj = {
 * blah
 * more blah
     * @param {String} arg1 hello
-    * @param {String} dude
+    * @param {Boolean} dude
 * blah blah
 * @return     {Array}
 */
@@ -70,6 +75,6 @@ obj.fn3 = function (arg1, arg2,arg3) {};
 /**
 * block for obj.fn4
 * @return blah blah
-* @param
+* @param asdf
 */
-obj['fn4'] = function () {};
+obj['fn4'] = function (asdf) {};

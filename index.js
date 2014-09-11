@@ -56,7 +56,6 @@ var getTypeFromString = function (str) {
 };
 
 var getReturn = function (text) {
-    // var returnRegex = /(@return)(.|\n)*?(?=(\*\/|@))/g;
     var returnRegex = /@return.*/g;
     var typeRegex = /\{(.+?)\}/;
     var returnSegment = text.match(returnRegex);
@@ -101,36 +100,57 @@ var flattenBlock = function (block) {
 
 var getParams = function (block, args) {
 
-    console.log('\n-----------\n', block);
-    console.log('args:', args);
-    console.log('^^^^^^^');
-
     var params = [];
     var paramRegex = /@param.*/gi;
 
     args = args.replace(/[\s\(\)]/gi, '').split(',');
+
     // If there was nothing there, clear the empty string.
     if (args.length === 1 && !args[0]) {
         args = [];
     }
 
+    // arguments
+    // Let's document all of them.  If they provided @param tags,
+    // we can add more information.
+    if (args.length) {
+        args.forEach(function (arg) {
+            params.push({
+                name: arg,
+                type: undefined,
+                description: undefined
+            });
+        });
+    }
 
     // documented params
     if (paramRegex.test(block)) {
-        console.log('documented params:', block.match(paramRegex).slice(0));
-        // console.log(block, args);
+
+        block.match(paramRegex).slice(0).forEach(function (param, index) {
+            // TODO: Stop recreating this regex ever time.
+            var typeRegex = /\{(.+)\}/;
+            var type;
+
+            // pull out the type
+            if (typeRegex.test(param)) {
+                // find the type
+                type = typeRegex.exec(param);
+                // trim the string since we're done with that part
+                param = param.substr(type.index + type[0].length);
+                // pluck out the captured group
+                type = type[1];
+            }
+
+            // Assume that these were defined in order.
+            if (params[index]) {
+                params[index].type = type;
+                // assume the rest is a description
+                params[index].description = param.trim();
+            } else {
+                throw new Error('Hey, you documented some params that do not exist.');
+            }
+        });
     }
-
-    // arguments
-    if (args.length) {
-        console.log('parsed args:', args);
-    }
-
-
-
-
-
-    // console.log(params);
 
     return params;
 };
@@ -189,7 +209,7 @@ var files = getFiles();
 
 files.forEach(function (file) {
     var data = getFileData(file);
-    // console.log(util.inspect(data, {
-    //     depth: null
-    // }));
+    console.log(util.inspect(data, {
+        depth: null
+    }));
 });
