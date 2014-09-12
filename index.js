@@ -3,7 +3,7 @@
 var util = require('util');
 var path = require('path');
 var fs = require('fs');
-
+var nextChar = require('next-char');
 
 
 var getFiles = function () {
@@ -185,6 +185,42 @@ var getBlocks = function (text) {
     return blocks;
 };
 
+/**
+* @param fnExec result of exec
+* @param {String} text
+* @return {String}
+*/
+var getFunctionScope = function (fnExec, text) {
+    var startIndex = fnExec.index + fnExec[0].length - 1;
+    var endIndex;
+    var scope;
+
+    text = text.substr(startIndex);
+    endIndex = nextChar.findClosingPairIndex(text);
+
+    if (endIndex !== undefined) {
+        scope = text.substr(0, endIndex + 1);
+    }
+
+    return scope;
+};
+
+var getFunctions = function (text) {
+    var functions = [];
+    var fnRegex = /function.*?\{/g;
+    var matches;
+    
+    text = text.replace(/(\n)/g, '');
+    matches = fnRegex.exec(text);
+    while (matches) {
+        console.log(getFunctionScope(matches, text));
+
+        matches = fnRegex.exec(text);
+    }
+
+    return functions;
+};
+
 var getFileData = function (file) {
     var data = {
         file: file
@@ -194,13 +230,15 @@ var getFileData = function (file) {
         encoding: 'utf8'
     });
 
-    data.blocks = getBlocks(text);
-    data.blocks.forEach(function (block) {
-        block.return = getReturn(block.raw);
+    // data.blocks = getBlocks(text);
+    // data.blocks.forEach(function (block) {
+    //     block.return = getReturn(block.raw);
 
-        // Delete the raw block once we're done.
-        delete block.raw;
-    });
+    //     // Delete the raw block once we're done.
+    //     delete block.raw;
+    // });
+
+    data.functions = getFunctions(text);
 
     return data;
 };

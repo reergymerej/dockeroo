@@ -70,7 +70,17 @@ var obj = {
 * blah blah
 * @return     {Array}
 */
-obj.fn3 = function (arg1, arg2,arg3) {};
+obj.fn3 = function (arg1, arg2,arg3) {
+    var foo = 123;
+
+    if (foo % 2 === 0) {
+        return 'donkey';
+    }
+
+    var doo = '34';
+
+    return doo;
+};
 
 /**
 * block for obj.fn4
